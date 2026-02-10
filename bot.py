@@ -1,3 +1,4 @@
+print("1. Loading libraries...")
 import os
 from dotenv import load_dotenv
 from selenium import webdriver
@@ -5,10 +6,11 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 
+print("2. Loading dot env...")
 # Load local config from .env
 load_dotenv()
 
-
+print("3. Initializing Brave options...")
 def init_driver():
     chrome_options = Options()
 
@@ -27,7 +29,7 @@ def init_driver():
     driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
 
-
+print("4. Opening Recruitment Portal")
 if __name__ == "__main__":
     bot = init_driver()
     bot.get(os.getenv("PORTAL_URL"))
