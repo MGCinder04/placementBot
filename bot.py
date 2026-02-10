@@ -1,44 +1,62 @@
-print("1. Loading libraries...")
 import os
+import time
 from dotenv import load_dotenv
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.edge.service import Service
+from selenium.webdriver.edge.options import Options
+from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
-print("2. Loading dot env...")
 # Load local config from .env
 load_dotenv()
 
-print("3. Initializing Brave options...")
+
 def init_driver():
-    chrome_options = Options()
+    print("Initializing Edge Driver...")
+    edge_options = Options()
 
-    # Point to Brave instead of Chrome
-    chrome_options.binary_location = os.getenv("BRAVE_PATH")
+    # 1. Point to the Edge Binary
+    edge_options.binary_location = os.getenv("EDGE_BINARY")
 
-    # Use your profile to stay logged in
-    chrome_options.add_argument(f"--user-data-dir={os.getenv('USER_DATA_DIR')}")
-    chrome_options.add_argument(f"--profile-directory={os.getenv('PROFILE_DIR')}")
+    # 2. Use your existing profile to bypass login screens
+    # Ensure Edge is CLOSED before running the script
+    edge_options.add_argument(f"--user-data-dir={os.getenv('USER_DATA_DIR')}")
+    edge_options.add_argument(f"--profile-directory={os.getenv('PROFILE_DIR')}")
 
-    # Prevent the "Chrome is being controlled by automated software" bar
-    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-    chrome_options.add_experimental_option("useAutomationExtension", False)
+    # 3. Stealth settings to avoid "Automation" banners
+    edge_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    edge_options.add_experimental_option("useAutomationExtension", False)
 
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=chrome_options)
-    return driver
+    # 4. Set up the service using webdriver-manager
+    # This automatically finds the correct EdgeDriver version for you
+    service = Service(EdgeChromiumDriverManager().install())
 
-print("4. Opening Recruitment Portal")
+    try:
+        driver = webdriver.Edge(service=service, options=edge_options)
+        return driver
+    except Exception as e:
+        print(f"Failed to start Edge: {e}")
+        print("TIP: Make sure all Edge windows are closed before running!")
+        return None
+
+
+def check_for_jobs(driver):
+    print(f"Navigating to: {os.getenv('PORTAL_URL')}")
+    driver.get(os.getenv("PORTAL_URL"))
+
+    # Let the page load
+    time.sleep(5)
+
+    # Logic for scraping the table will go here next
+    print("Page Title:", driver.title)
+
+
 if __name__ == "__main__":
     bot = init_driver()
-    bot.get(os.getenv("PORTAL_URL"))
 
-    # Check if we are actually logged in
-    print("Page loaded. Check the browser window!")
+    if bot:
+        check_for_jobs(bot)
 
-    # Give yourself time to look, then close
-    import time
-
-    time.sleep(10)
-    bot.quit()
+        # Keep it open for a bit to verify the login state
+        print("Verification window open. Closing in 10 seconds...")
+        time.sleep(10)
+        bot.quit()
