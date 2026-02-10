@@ -6,57 +6,61 @@ from selenium.webdriver.edge.service import Service
 from selenium.webdriver.edge.options import Options
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
-# Load local config from .env
 load_dotenv()
 
 
 def init_driver():
-    print("Initializing Edge Driver...")
+    print("Connecting to Edge...")
     edge_options = Options()
 
-    # 1. Point to the Edge Binary
-    edge_options.binary_location = os.getenv("EDGE_BINARY")
+    # 1. Load and Validate Environment Variables
+    binary = os.getenv("EDGE_BINARY")
+    user_data = os.getenv("USER_DATA_DIR")
+    profile = os.getenv("PROFILE_DIR", "Default")
+    driver_path = os.getenv("EDGE_DRIVER_PATH")  # Path to your manual download
 
-    # 2. Use your existing profile to bypass login screens
-    # Ensure Edge is CLOSED before running the script
-    edge_options.add_argument(f"--user-data-dir={os.getenv('USER_DATA_DIR')}")
-    edge_options.add_argument(f"--profile-directory={os.getenv('PROFILE_DIR')}")
+    if not binary or not user_data:
+        raise ValueError(
+            "Critical Error: .env variables not found. Check your .env file name and location!"
+        )
 
-    # 3. Stealth settings to avoid "Automation" banners
+    # 2. Configure Browser Options
+    edge_options.binary_location = binary
+    edge_options.add_argument(f"--user-data-dir={user_data}")
+    edge_options.add_argument(f"--profile-directory={profile}")
+
+    # Anti-detection and stability flags
     edge_options.add_experimental_option("excludeSwitches", ["enable-automation"])
     edge_options.add_experimental_option("useAutomationExtension", False)
+    edge_options.add_argument("--disable-blink-features=AutomationControlled")
 
-    # 4. Set up the service using webdriver-manager
-    # This automatically finds the correct EdgeDriver version for you
-    service = Service(EdgeChromiumDriverManager().install())
+    # 3. Service Initialization Logic
+    # We check if a local driver exists first to bypass the "Offline/Host" error
+    if driver_path and os.path.exists(driver_path):
+        print(f"Using local driver at: {driver_path}")
+        service = Service(executable_path=driver_path)
+    else:
+        print(
+            "Local driver not found or path not set. Falling back to Network Manager..."
+        )
+        try:
+            service = Service(EdgeChromiumDriverManager().install())
+        except Exception as e:
+            print(f"Network Manager failed: {e}")
+            raise RuntimeError(
+                "Could not start Edge. Please download msedgedriver.exe manually."
+            )
 
-    try:
-        driver = webdriver.Edge(service=service, options=edge_options)
-        return driver
-    except Exception as e:
-        print(f"Failed to start Edge: {e}")
-        print("TIP: Make sure all Edge windows are closed before running!")
-        return None
-
-
-def check_for_jobs(driver):
-    print(f"Navigating to: {os.getenv('PORTAL_URL')}")
-    driver.get(os.getenv("PORTAL_URL"))
-
-    # Let the page load
-    time.sleep(5)
-
-    # Logic for scraping the table will go here next
-    print("Page Title:", driver.title)
+    return webdriver.Edge(service=service, options=edge_options)
 
 
 if __name__ == "__main__":
-    bot = init_driver()
-
-    if bot:
-        check_for_jobs(bot)
-
-        # Keep it open for a bit to verify the login state
-        print("Verification window open. Closing in 10 seconds...")
-        time.sleep(10)
+    try:
+        # IMPORTANT: Close all Edge windows before running
+        bot = init_driver()
+        bot.get(os.getenv("PORTAL_URL"))
+        print("Success! Staying open for 15 seconds...")
+        time.sleep(15)
         bot.quit()
+    except Exception as e:
+        print(f"Failed: {e}")
