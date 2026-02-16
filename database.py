@@ -49,3 +49,25 @@ def add_job(company, role, profile, deadline, proforma):
     conn.commit()
     conn.close()
     print(f"Stored in DB: {company} | {role}")
+
+
+def add_application(company, profile, deadline, applied_on, resume):
+    """Inserts a personal application record into the DB."""
+    # Create a unique hash for the application
+    combined = f"{company}{profile}{applied_on}".lower().replace(" ", "")
+    app_hash = hashlib.md5(combined.encode()).hexdigest()
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    sql = """
+        INSERT IGNORE INTO my_applications 
+        (app_hash, company_name, profile, deadline_text, applied_on, resume_id) 
+        VALUES (%s, %s, %s, %s, %s, %s)
+    """
+    values = (app_hash, company, profile, deadline, applied_on, resume)
+
+    cursor.execute(sql, values)
+    conn.commit()
+    conn.close()
+    print(f"Application Logged: {company} - {profile}")

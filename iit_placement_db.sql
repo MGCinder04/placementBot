@@ -12,3 +12,14 @@ CREATE TABLE job_openings (
     proforma_link TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS my_applications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    app_hash VARCHAR(64) UNIQUE, 
+    company_name VARCHAR(255) NOT NULL,
+    profile VARCHAR(255) NOT NULL,
+    deadline_text VARCHAR(100),
+    applied_on VARCHAR(100),
+    resume_id VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
