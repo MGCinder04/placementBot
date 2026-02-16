@@ -23,3 +23,12 @@ CREATE TABLE IF NOT EXISTS my_applications (
     resume_id VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS portal_notices (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    notice_hash VARCHAR(64) UNIQUE,
+    title TEXT NOT NULL,
+    published_date VARCHAR(100),
+    tags TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
