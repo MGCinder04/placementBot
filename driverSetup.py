@@ -24,5 +24,9 @@ def init_driver():
     edge_options.add_experimental_option("useAutomationExtension", False)
     edge_options.add_argument("--disable-blink-features=AutomationControlled")
 
+    edge_options.add_argument("--headless=new")
+    edge_options.add_argument("--no-sandbox")
+    edge_options.add_argument("--disable-dev-shm-usage")
+
     service = Service()
     return webdriver.Edge(service=service, options=edge_options)
