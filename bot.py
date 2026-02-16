@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 # Import our custom modular muscles
 from driverSetup import init_driver
 from auth import login_if_needed
-from scraper import scrape_job_openings
+from jobOpeningScraper import scrape_job_openings
 from database import is_job_new, add_job, generate_job_hash
 from notifications import send_telegram_notification
 
