@@ -2,7 +2,7 @@ name: Hourly Placement Bot
 
 on:
   schedule:
-    - cron: '0 * * * *' # Runs at the 0th minute of every hour
+    - cron: '0 */2 * * *' # Runs at the 0th minute of every 2nd hour
   workflow_dispatch: # Gives you a manual "Run" button to test it
 
 jobs:

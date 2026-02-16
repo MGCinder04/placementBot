@@ -7,6 +7,7 @@ load_dotenv()
 
 # UPDATED: Now includes the direct link to the Openings page
 def send_telegram_notification(company, role, profile, deadline, proforma_link):
+    baseURL = os.getenv("PORTAL_URL").rstrip('/')
     token = os.getenv("TELEGRAM_TOKEN")
     chat_id = os.getenv("TELEGRAM_CHAT_ID")
     url = f"https://api.telegram.org/bot{token}/sendMessage"
@@ -18,7 +19,7 @@ def send_telegram_notification(company, role, profile, deadline, proforma_link):
         f"📄 *Profile:* {profile}\n"
         f"⏳ *Deadline:* {deadline}\n\n"
         f"🔗 [View Proforma]({proforma_link})\n"
-        f"🌐 [Open Portal Page](https://placement.iitk.ac.in/student/rc/16/opening)"
+        f"🌐 [Open Portal Page]({baseURL}/student/rc/16/opening)"
     )
 
     payload = {"chat_id": chat_id, "text": message, "parse_mode": "Markdown"}
@@ -31,6 +32,7 @@ def send_telegram_notification(company, role, profile, deadline, proforma_link):
 
 # NEW: Notice specific alert
 def send_notice_alert(title, date, tags):
+    baseURL = os.getenv("PORTAL_URL").rstrip("/")
     token = os.getenv("TELEGRAM_TOKEN")
     chat_id = os.getenv("TELEGRAM_CHAT_ID")
     url = f"https://api.telegram.org/bot{token}/sendMessage"
@@ -40,7 +42,7 @@ def send_notice_alert(title, date, tags):
         f"📌 *Title:* {title}\n"
         f"🕒 *Date:* {date}\n"
         f"🏷️ *Tags:* {tags}\n\n"
-        f"🌐 [Open Notices Page](https://placement.iitk.ac.in/student/rc/16/notices)"
+        f"🌐 [Open Notices Page]({baseURL}/student/rc/16/notices)"
     )
 
     payload = {"chat_id": chat_id, "text": message, "parse_mode": "Markdown"}

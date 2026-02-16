@@ -45,6 +45,7 @@ def is_company_match(notice_title, applied_companies):
 
 
 def main():
+    baseURL = os.getenv("PORTAL_URL").rstrip('/')
     bot = None
     try:
         # 1. Setup Driver
@@ -54,7 +55,7 @@ def main():
         login_if_needed(bot)
 
         # --- PART A: JOB OPENINGS ---
-        opening_url = "https://placement.iitk.ac.in/student/rc/16/opening"
+        opening_url = f"{baseURL}/student/rc/16/opening"
         print(f"Navigating to openings page: {opening_url}")
         bot.get(opening_url)
         time.sleep(10)  # Allow DataGrid to populate
@@ -81,7 +82,7 @@ def main():
                     )
 
         # --- PART B: MY APPLICATIONS ---
-        app_url = "https://placement.iitk.ac.in/student/rc/16/applications"
+        app_url = f"{baseURL}/student/rc/16/applications"
         print(f"Navigating to applications page: {app_url}")
         bot.get(app_url)
         time.sleep(10)  # Allow DataGrid to populate
@@ -98,7 +99,7 @@ def main():
             )
 
         # --- PART C: NOTICES (Placeholder) ---
-        notice_url = "https://placement.iitk.ac.in/student/rc/16/notices"
+        notice_url = f"{baseURL}/student/rc/16/notices"
         print(f"Navigating to notices page: {notice_url}")
         bot.get(notice_url)
         time.sleep(10)  # Allow DataGrid to populate
