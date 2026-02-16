@@ -71,3 +71,40 @@ def add_application(company, profile, deadline, applied_on, resume):
     conn.commit()
     conn.close()
     print(f"Application Logged: {company} - {profile}")
+
+
+def get_applied_companies():
+    """Fetches a list of all distinct companies the user has applied to."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT DISTINCT company_name FROM my_applications")
+    results = cursor.fetchall()
+    conn.close()
+    # Returns a list of strings: ['AECOM', 'Microsoft India', ...]
+    return [row[0] for row in results]
+
+
+def is_notice_new(notice_hash):
+    """Checks if a notice is already saved."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT id FROM portal_notices WHERE notice_hash = %s", (notice_hash,)
+    )
+    result = cursor.fetchone()
+    conn.close()
+    return result is None
+
+
+def add_notice(title, published_date, tags, notice_hash):
+    """Saves a matched notice into the database."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    sql = """
+        INSERT IGNORE INTO portal_notices (notice_hash, title, published_date, tags) 
+        VALUES (%s, %s, %s, %s)
+    """
+    cursor.execute(sql, (notice_hash, title, published_date, tags))
+    conn.commit()
+    conn.close()
+    print(f"Logged Notice: {title[:30]}...")
