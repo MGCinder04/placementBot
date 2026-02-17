@@ -108,11 +108,9 @@ def main():
         portal_notices = scrape_notices(bot)
 
         for notice in portal_notices:
-            # Generate a unique hash for the notice
-            combined = f"{notice['title']}{notice['created_at']}".lower().replace(
-                " ", ""
-            )
-            notice_hash = hashlib.md5(combined.encode()).hexdigest()
+            # Generate hash based ONLY on the title to ignore server timezone shifts
+            clean_title = re.sub(r"[^a-z0-9]", "", notice["title"].lower())
+            notice_hash = hashlib.md5(clean_title.encode()).hexdigest()
 
             # Check if we already processed this notice
             if is_notice_new(notice_hash):
