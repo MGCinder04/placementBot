@@ -18,8 +18,8 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install Microsoft Edge
-        uses: browser-actions/setup-edge@latest
+      # - name: Install Microsoft Edge
+      #   uses: browser-actions/setup-edge@latest
 
       - name: Install Python Dependencies
         run: |
